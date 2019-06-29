@@ -23,7 +23,7 @@ from Log import Log
 bot = telebot.TeleBot(token=config.BOT_TOKEN)
 logAdapter = Log()
 dbAdapter = DataBase(main_log=logAdapter)
-apihelper.proxy = {'http': config.PROXY}
+apihelper.proxy = {'https': config.PROXY}
 
 
 def parse_summary(summary):
@@ -47,7 +47,7 @@ def send_articles():
 			file.close()
 			last_article_time = datetime.strptime(last_article_info["last_time"], "%Y-%m-%d %H:%M:%S")
 
-			dbAdapter.add_user(101)
+			#dbAdapter.add_user(101)
 			users = dbAdapter.get_all_users()
 			
 			articles_list = feedparser.parse(config.SITE_ADDRESS)["entries"]
@@ -80,7 +80,7 @@ def send_articles():
 							try:
 								bot.send_message(user, message_text, parse_mode="HTML")
 							except Exception as e:
-								logAdapter.error(str(e))
+								logAdapter.error(str(e) + ' <-send art to users')
 				
 				# Сохранение времени поселдней опубликованой(!) статьи. Формируется из времени первой статьи в списке
 				new_article_time = datetime.strptime(articles_list[0]["published"], "%a, %d %b %Y %H:%M:%S %Z")
@@ -92,7 +92,7 @@ def send_articles():
 				logAdapter.error("Empty 'entries'")
 				
 		except Exception as e:
-			logAdapter.error(str(e))
+			logAdapter.error(str(e) + ' <-send_article')
 
 		# Проверка новых статей каждые config.COOLDOWN секунд
 		time.sleep(config.COOLDOWN)
@@ -103,6 +103,7 @@ def start(message):
 	result = dbAdapter.add_user(message.chat.id)
 	if result is None:
 		bot.send_message(message.chat.id, config.ERROR_MESSAGE)
+		logAdapter.error('smth wrong with db <-start')
 	else:
 		bot.send_message(message.chat.id, "Привет, " + message.from_user.first_name + "\nВведи /help для справки.")
 
@@ -112,6 +113,7 @@ def stop(message):
 	result = dbAdapter.turn_mailout_off(message.chat.id)
 	if result is None:
 		bot.send_message(message.chat.id, config.ERROR_MESSAGE)
+		logAdapter.error('smth wrong with db <-stop')
 	else:
 		bot.send_message(message.chat.id, "Рассылка приостановлена.")
 
@@ -126,6 +128,7 @@ def show_tags(message):
 	result = dbAdapter.get_tags(message.chat.id)
 	if result is None:
 		bot.send_message(message.chat.id, config.ERROR_MESSAGE)
+		logAdapter.error('smth wrong with db <-show_tags')
 	elif len(result) == 0:
 		bot.send_message(message.chat.id, "Тегов нет")
 	else:
@@ -141,9 +144,10 @@ def add_new_tags(message):
 		bot.send_message(message.chat.id, "Ошибка: список тегов слишком большой. Добавляйте теги постепенно.")
 	else:
 		result = dbAdapter.add_tags(message.chat.id, text)
-		
+
 		if result is None:
 			bot.send_message(message.chat.id, config.ERROR_MESSAGE)
+			logAdapter.error('smth wrong with db <-add_new_tags')
 		else:
 			bot.send_message(message.chat.id, "Теги добавлены. Обновленный список тегов:\n" + "\n".join(result))
 
@@ -160,7 +164,7 @@ def copy_tags(message):
 		try:
 			user_profile_site = urllib.request.urlopen(user_url, timeout=5).read().decode("utf-8")
 		except Exception as e:
-			logAdapter.error(str(e))
+			logAdapter.error(str(e) + ' <-copy_tags')
 			bot.send_message(message.chat.id, config.ERROR_MESSAGE)
 		else:
 			row_tags = re.findall(regex, user_profile_site)
@@ -191,6 +195,7 @@ def delete_tags(message):
 		
 		if result is None:
 			bot.send_message(message.chat.id, config.ERROR_MESSAGE)
+			logAdapter.error('smth wrong with db <-delete_tags')
 		elif len(result) != 0:
 			bot.send_message(message.chat.id, "Теги удалены. Обновленный список тегов:\n" + "\n".join(result))
 		else:
@@ -202,6 +207,7 @@ def delete_all_tags(message):
 	result = dbAdapter.del_all_tags(message.chat.id)
 	if result is None:
 		bot.send_message(message.chat.id, config.ERROR_MESSAGE)
+		logAdapter.error('smth wrong with db <-delete_all_tags')
 	else:
 		bot.send_message(message.chat.id, "Список тегов пуст")
 
@@ -211,15 +217,15 @@ send_articles_thread.start()
 
 
 # Start bot
-cnt=0
+#cnt=0
 while True:
 	try:
-		if cnt % 40 == 0:
-			logAdapter.event("Launch bot")
-		cnt += 1
+		#if cnt % 40 == 0:
+		logAdapter.event("Launch bot")
+		#cnt += 1
 		bot.threaded = False
 		bot.skip_pending = True
 		bot.polling()
 	except Exception as e:
-		logAdapter.error(str(e))
+		logAdapter.error(str(e) + ' <-main')
 		bot.stop_polling()

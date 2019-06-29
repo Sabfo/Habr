@@ -2,16 +2,16 @@
 SITE_ADDRESS = "https://habrahabr.ru/rss/all/"
 DB_NAME = "users.db"
 BOT_TOKEN = "785639337:AAFbs7urnWipVsCeX9AuTmiMwLOd4i61ArY"
-PROXY = 'https://164.132.195.3:3128'
+PROXY = 'https://190.104.8.19:3128'
 
-COOLDOWN = 60  # in seconds
+COOLDOWN = 300  # in seconds
 
 HELP_TEXT = '''Список команд:
 	/my_tags - показать список тегов, на которые пользователь подписан
 	/add_tags - добавить теги (пример: /add_tags IT Алгоритмы)
 	/del_tags - удалить теги (пример: /del_tags IT Алгоритмы)
 	/del_all_tags - удалить ВСЕ теги
-	/copy_tags - скопировать теги из профиля на habrahabr'e (пример: /copy_tags https://habrahabr.ru/users/kirtis/)
+	/copy_tags - скопировать теги из профиля на habr'e (пример: /copy_tags https://habr.ru/users/<user_name>/)
 	/stop - приостановить рассылку (для продолжения рассылки - /start)
 
 	Уточнения:
