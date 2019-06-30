@@ -47,7 +47,6 @@ def send_articles():
 			file.close()
 			last_article_time = datetime.strptime(last_article_info["last_time"], "%Y-%m-%d %H:%M:%S")
 
-			#dbAdapter.add_user(101)
 			users = dbAdapter.get_all_users()
 			
 			articles_list = feedparser.parse(config.SITE_ADDRESS)["entries"]

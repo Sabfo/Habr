@@ -20,6 +20,13 @@ class DataBase:
 		"""
 		self.connection = sqlite3.connect(config.DB_NAME, check_same_thread=False)
 		self.cursor = self.connection.cursor()
+		self.cursor.execute("""CREATE TABLE "users" (
+								`id` INTEGER,
+								`tags` TEXT DEFAULT "",
+								`is_stop` INTEGER DEFAULT 0,
+								PRIMARY KEY(`id`) )
+							""")
+		self.connection.commit()
 		self.log = main_log
 	
 	def add_user(self, id):
